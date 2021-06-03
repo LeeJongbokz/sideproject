@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { IEvent } from '../../schemas/types';
-import styled from 'styled-components';
-import SearchIcon from '@material-ui/icons/Search';
-import * as API from '../../apis';
-import { RouteComponentProps, useHistory } from 'react-router-dom';
-
+import React, { useState, useEffect } from "react";
+import { IEvent } from "../../schemas/types";
+import styled from "styled-components";
+import SearchIcon from "@material-ui/icons/Search";
+import * as API from "../../apis";
+import { RouteComponentProps, useHistory } from "react-router-dom";
 
 const Container = styled.div`
   display: flex;
@@ -18,7 +17,6 @@ const Group = styled.section`
   display: flex;
   flex-direction: row;
 `;
-
 
 const ParticipatingEventsBox = styled.div`
   font-size: 20px;
@@ -113,7 +111,6 @@ const TEXT = styled.p`
   margin-left: 15px;
 `;
 
-
 const ParticipatingEvent = styled.li`
   margin-top: 10px;
   margin-left: 20px;
@@ -129,68 +126,70 @@ const OnGoingEvent = styled.li`
   margin-right: 30px;
 `;
 
-
 const Main = () => {
+  const history = useHistory();
 
-    const history = useHistory();
+  const [ParticipatingEvents, setParticipatingEvents] = useState<IEvent[]>([]);
 
-    const [ParticipatingEvents, setParticipatingEvents] = useState<IEvent[]>(
-                []
-    );
+  const [OnGoingEvents, setOnGoingEvents] = useState<IEvent[]>([]);
 
-    const [OnGoingEvents, setOnGoingEvents] = useState<IEvent[]>(
-                []
-    );    
+  useEffect(() => {
+    API.getParticipatingEvents()
+      .then((res) => setParticipatingEvents(res))
+      .catch((e) => console.log(e));
 
-    useEffect(() => {
-        API.getParticipatingEvents()
-        .then(res => setParticipatingEvents(res))
-        .catch(e => console.log(e));
+    API.getOngoingEvents()
+      .then((res) => setOnGoingEvents(res))
+      .catch((e) => console.log(e));
+  }, []);
 
-        API.getOngoingEvents()
-        .then(res => setOnGoingEvents(res))
-        .catch(e => console.log(e));
-    }, []);
+  const eventManage = (name: string | undefined) => {
+    const url = "/me/event/" + name;
+    window.location.href = url;
+  };
 
-    const eventManage = (name: string | undefined) => {
-
-      const url = "/me/event/" + name;
-      window.location.href = url;
-    }
-   
-    
-    return (
-        <Container>
-             <Group>  
-                  <FindEventBox>
-                          <Name>이벤트 찾기</Name>    
-                          <Search>
-                              <FindEvent type="text" />
-                              <SearchIcon style={{ width:"45px", height:"45px" }} />
-                          </Search>
-                  </FindEventBox>
-                 <ParticipatingEventsBox>
-                    <H3>참여 중인 이벤트</H3>
-                    {ParticipatingEvents.map(event =>
-                         <ParticipatingEvent key={event.id} onClick={() => history.push('/event/client/reception/1')}
-                         ><img src={event.thumbnail}width="200" height="100"></img>
-                         <TEXT>{event.description}</TEXT></ParticipatingEvent>
-                    )}
-                </ParticipatingEventsBox>
-            </Group>      
-            <Group>    
-              <OnGoingEventsBox>
-                  <H3>진행 중인 이벤트</H3>
-                  <Events>
-                      {OnGoingEvents.map(event =>
-                          <OnGoingEvent key={event.id}><img onClick={() => eventManage(event.title)} src={event.thumbnail}width="200" height="100"></img>
-                          </OnGoingEvent>
-                      )} 
-                  </Events>
-              </OnGoingEventsBox>
-            </Group>
-        </Container>
-    )
+  return (
+    <Container>
+      <Group>
+        <FindEventBox>
+          <Name>이벤트 찾기</Name>
+          <Search>
+            <FindEvent type="text" />
+            <SearchIcon style={{ width: "45px", height: "45px" }} />
+          </Search>
+        </FindEventBox>
+        <ParticipatingEventsBox>
+          <H3>참여 중인 이벤트</H3>
+          {ParticipatingEvents.map((event) => (
+            <ParticipatingEvent
+              key={event.id}
+              onClick={() => history.push("/event/client/reception/1")}
+            >
+              <img src={event.thumbnail} width="200" height="100"></img>
+              <TEXT>{event.description}</TEXT>
+            </ParticipatingEvent>
+          ))}
+        </ParticipatingEventsBox>
+      </Group>
+      <Group>
+        <OnGoingEventsBox>
+          <H3>진행 중인 이벤트</H3>
+          <Events>
+            {OnGoingEvents.map((event) => (
+              <OnGoingEvent key={event.id}>
+                <img
+                  onClick={() => eventManage(event.title)}
+                  src={event.thumbnail}
+                  width="200"
+                  height="100"
+                ></img>
+              </OnGoingEvent>
+            ))}
+          </Events>
+        </OnGoingEventsBox>
+      </Group>
+    </Container>
+  );
 };
 
 export default Main;
