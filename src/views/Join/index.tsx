@@ -1,254 +1,196 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
+import React, { useState } from "react";
+import styled from "styled-components";
 import {
   characterValidation,
   confirmPasswordValidation,
   emailValidation,
-  passwordValidation
-} from '../../utils/validate';
-import * as API from '../../apis';
+  passwordValidation,
+} from "../../utils/validate";
+import * as API from "../../apis";
+import Input from "../../components/Input2";
+import { Row } from "../../utils/layout";
+import { grey_6, grey_8, purple_1 } from "../../utils/colorPalette";
 
 const JoinBox = styled.div`
-  display: inline-block;
-  vertical-align: middle;
-  text-align: center;
-  width: 600px;
-  height: 500px;
-  position: absolute;
-  left: 30%;
-  top: 18%;
-`;
-
-const NameBox = styled.div`
+  width: 100vw;
+  height: 100vh;
   display: flex;
-  flex-direction: row;
-  width: 700px;
-  height: 100px;
-  margin-left: 70px;
+  justify-content: center;
+  align-items: center;
+  background-color: #f1f3f5;
 `;
 
-const Box = styled.div`
-  display: flex-column;
-  align-items:center;
-  font-size: 20px;
-  font-weight: bold;
-  height: 75px;
-  margin-bottom: 30px;
-  &:nth-child(1){
-    margin-bottom: 0px;
-    margin-left: 10px;
-    width: 200px;
-    text-align: center;
-  }
-  &:nth-child(2){
-    margin-bottom: 0px;
-    margin-left: 40px;
-    width: 200px;
-    text-align: center;
-  }
-`;
-
-const FirstName = styled.input`
-  width: 200px;
-  height: 40px;
-  border: solid 1px #808080;
-  border-radius:5px;
-`;
-
-const LastName = styled.input`
-  width: 200px;
-  height: 40px;
-  border: solid 1px #808080;
-  border-radius:5px;
-`;
-
-const Email = styled.input`
-  width: 430px;
-  height: 40px;
-  border: solid 1px #808080;
-  border-radius:5px;
-  margin-bottom: 5px;
-`;
-
-const Password = styled.input`
-  width: 430px;
-  height: 40px;
-  border: solid 1px #808080;
-  border-radius:5px;
-  margin-bottom: 5px;
-`;
-
-const ConfirmPassword = styled.input`
-  width: 430px;
-  height: 40px;
-  border: solid 1px #808080;
-  border-radius:5px;
-  margin-bottom: 5px;
+const FormBox = styled.div`
+  width: 80vw;
+  max-width: 520px;
+  min-width: 320px;
+  height: 640px;
+  background-color: #fff;
+  padding: 4% 6%;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 `;
 
 const SignUp = styled.button`
-  width: 430px;
+  width: 100%;
   height: 40px;
   margin-top: 10px;
-  font-size: 18px;
-  background-color: #006CA7;
+  font-size: 14px;
+  background-color: ${purple_1};
   color: white;
+  border: none;
+  border-radius: 8px;
 `;
 
 const H3 = styled.h3`
-  margin-left: 10px;
-  margin-bottom: 30px;
-  margin-block-start: 0;
-  color: #000000;
+  font-size: 2em;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: ${grey_8};
 `;
 
-const Name = styled.h5`
-  text-align: left;
-  margin: 10px;
-  font-weight: lighter;
-`;
-
-const H5 = styled.h5`
-  text-align: left;
-  padding-left: 80px;
-  margin: 10px;
-  font-weight: lighter;
-`;
-
-const ErrorMessage = styled.p`
-  color: #f00;
+const DescriptionBox = styled.p`
   font-size: 12px;
-  text-align: left;
-  margin-left: 85px;
-  margin-block-start: 0;
-  margin-block-end: 0;
-  margin-bottom: 10px;
-  width: 210px;
-`;
-
-const NameErrorMessage = styled.p`
-  color: #f00;
-  font-size: 12px;
-  text-align: left;
-  margin-left: 0px;
-  margin-block-start: 0;
-  margin-block-end: 0;
-  margin-bottom: 10px;
-  width: 210px;
+  color: ${grey_6};
 `;
 
 const Join = () => {
   const [formState, setFormState] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
+    name: "",
+    email: "",
+    confirmEmail: "",
+    password: "",
+    confirmPassword: "",
   });
-    
-  const [firstNameErrorMessage, setFirstNameErrorMessage] = useState('');
-  const [lastNameErrorMessage, setLastNameErrorMessage] = useState('');
-  const [emailErrorMessage, setEmailErrorMessage] = useState('');
-  const [passwordErrorMessage, setPasswordErrorMessage] = useState('');
-  const [confirmPasswordErrorMessage, setConfirmPasswordErrorMessage] = useState('');
-  
+
+  const [nameErrorMessage, setNameErrorMessage] = useState("");
+  const [emailErrorMessage, setEmailErrorMessage] = useState("");
+  const [passwordErrorMessage, setPasswordErrorMessage] = useState("");
+  const [
+    confirmPasswordErrorMessage,
+    setConfirmPasswordErrorMessage,
+  ] = useState("");
+
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormState({...formState, [name]: value});
-  }
+    setFormState({ ...formState, [name]: value });
+  };
 
-  const onSubmitForm = function(){
-    const name = formState.firstName + " " + formState.lastName;
-    setEmailErrorMessage('');
-    setFirstNameErrorMessage('');
-    setLastNameErrorMessage('');
-    setPasswordErrorMessage('');
-    setConfirmPasswordErrorMessage('');
+  const onSubmitForm = function () {
+    setEmailErrorMessage("");
+    setNameErrorMessage("");
+    setPasswordErrorMessage("");
+    setConfirmPasswordErrorMessage("");
 
-    const firstNameMessage = characterValidation(formState.firstName);
+    const nameMessage = characterValidation(formState.name);
 
-    if(firstNameMessage !== ''){
-      setFirstNameErrorMessage(firstNameMessage);
+    if (nameMessage !== "") {
+      setNameErrorMessage(nameMessage);
       return false;
     }
-
-    const lastNameMessage = characterValidation(formState.lastName);
-
-    if(lastNameMessage !== ''){
-      setLastNameErrorMessage(lastNameMessage);
-      return false;
-    }
-
 
     const emailMessage = emailValidation(formState.email);
 
-    if(emailMessage !== ''){
+    if (emailMessage !== "") {
       setEmailErrorMessage(emailMessage);
       return false;
     }
 
     const passwordMessage = passwordValidation(formState.password);
-        
-    if(passwordMessage !== '') {
+
+    if (passwordMessage !== "") {
       setPasswordErrorMessage(passwordMessage);
       return false;
     }
 
-    const confirmPasswordMessage = confirmPasswordValidation(formState.password, formState.confirmPassword);
+    const confirmPasswordMessage = confirmPasswordValidation(
+      formState.password,
+      formState.confirmPassword
+    );
 
-    if(confirmPasswordMessage !== ''){
+    if (confirmPasswordMessage !== "") {
       setConfirmPasswordErrorMessage(confirmPasswordMessage);
       return false;
     }
-    
+
     // 회원가입(signup)
-    API.signup({name, email:formState.email, password:formState.password})
-    .then(json => {
-      if (json.error)
-        throw json;
-        
-      alert("회원가입을 성공적으로 마쳤습니다. 로그인해주세요!");
-      window.location.href = "/login";
+    API.signup({
+      name: formState.name,
+      email: formState.email,
+      password: formState.password,
     })
-    .catch((error) => {
-      alert("서버 오류 발생! 잠시후 다시 시도해주세요. 메시지:"+JSON.stringify(error));
-    });
+      .then((json) => {
+        if (json.error) throw json;
+
+        alert("회원가입을 성공적으로 마쳤습니다. 로그인해주세요!");
+        window.location.href = "/login";
+      })
+      .catch((error) => {
+        alert(
+          "서버 오류 발생! 잠시후 다시 시도해주세요. 메시지:" +
+            JSON.stringify(error)
+        );
+      });
   };
 
   return (
-    <div>
-      <JoinBox>
-        <H3>회원가입</H3>
-        <NameBox>
-          <Box><Name>이름(first name)</Name>
-            <FirstName type="text" name="firstName" onChange={onChange} value={formState.firstName} />
-            {firstNameErrorMessage !== '' &&
-            <NameErrorMessage>{firstNameErrorMessage}</NameErrorMessage>}
-          </Box>
-          <Box><Name>성(last name)</Name>
-            <LastName type="text" name="lastName" onChange={onChange} value={formState.lastName} />
-            {lastNameErrorMessage !== '' &&
-            <NameErrorMessage>{lastNameErrorMessage}</NameErrorMessage>}
-          </Box>
-        </NameBox>
-        <Box><H5>이메일 주소(계정)</H5>
-          <Email type="email" name="email" onChange={onChange} value={formState.email} />
-          {emailErrorMessage !== '' &&
-          <ErrorMessage>{emailErrorMessage}</ErrorMessage>}
-        </Box>
-        <Box><H5>비밀번호</H5>
-          <Password type="password" name="password" onChange={onChange} value={formState.password} />
-          {passwordErrorMessage !== '' &&
-          <ErrorMessage>{passwordErrorMessage}</ErrorMessage>}
-        </Box>
-        <Box><H5>비밀번호 확인</H5>
-          <ConfirmPassword type="password" name="confirmPassword" onChange={onChange} value={formState.confirmPassword}/>
-          {confirmPasswordErrorMessage !== '' &&
-          <ErrorMessage>{confirmPasswordErrorMessage}</ErrorMessage>}
-        </Box>
-        <SignUp onClick={onSubmitForm}>회원 가입하기 </SignUp>  
-      </JoinBox>
-    </div>
+    <JoinBox>
+      <FormBox>
+        <Row>
+          <H3>Sign Up.</H3>
+          <DescriptionBox>
+            Give us some of your information to get free access to frendly.
+          </DescriptionBox>
+        </Row>
+        <Row paddingTop="20px">
+          <Input
+            type="text"
+            label="Name"
+            name="name"
+            onChange={onChange}
+            value={formState.name}
+            error={nameErrorMessage}
+          />
+          <Input
+            type="email"
+            label="Email"
+            name="email"
+            onChange={onChange}
+            value={formState.email}
+            error={emailErrorMessage}
+          />
+          <Input
+            type="text"
+            label="Confirm email"
+            name="email"
+            onChange={onChange}
+            value={formState.confirmEmail}
+            error={emailErrorMessage}
+          />
+          <Input
+            type="password"
+            label="Password"
+            name="password"
+            onChange={onChange}
+            value={formState.password}
+            error={passwordErrorMessage}
+          />
+          <Input
+            type="password"
+            label="Confirm password"
+            name="confirmPassword"
+            onChange={onChange}
+            value={formState.confirmPassword}
+            error={confirmPasswordErrorMessage}
+          />
+        </Row>
+        <Row>
+          <SignUp onClick={onSubmitForm}>Create account</SignUp>
+        </Row>
+      </FormBox>
+    </JoinBox>
   );
 };
 

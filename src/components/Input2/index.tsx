@@ -1,5 +1,7 @@
 import React, { ReactElement } from "react";
 import styled from "styled-components";
+import { grey_4, grey_7, red_2 } from "../../utils/colorPalette";
+import { Row, Column } from "../../utils/layout";
 
 const InputBox = styled.div`
   display: flex;
@@ -7,13 +9,17 @@ const InputBox = styled.div`
   padding-bottom: 10px;
 `;
 
-const Label = styled.label``;
+const Label = styled.label`
+  color: ${grey_7};
+  font-size: 12px;
+  margin-bottom: 4px;
+`;
 
 const Text = styled.input`
-  border-radius: 3px;
-  padding: 9px 13px;
-  border: 1px solid #bcbcbc;
-  box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  padding: 6px 8px;
+  border: 1px solid ${grey_4};
+  box-shadow: 1px 2px 1px rgba(131, 131, 131, 0.1);
   outline: none;
   margin-top: 3px;
   &:focus {
@@ -23,7 +29,8 @@ const Text = styled.input`
 `;
 
 const ErrorMessage = styled.p`
-  color: #f00;
+  font-size: 10px;
+  color: ${red_2};
 `;
 
 interface Props {
@@ -47,9 +54,20 @@ export default function Input({
 }: Props): ReactElement {
   return (
     <InputBox>
-      {label && <Label>{label}</Label>}
+      <Row>
+        <Column padding="0" width="100px">
+          {label && <Label>{label}</Label>}
+        </Column>
+        <Column
+          padding="0"
+          float="right"
+          textAlign="right"
+          width="calc(100% - 100px)"
+        >
+          {error && <ErrorMessage>{error}</ErrorMessage>}
+        </Column>
+      </Row>
       <Text type={type} id={id} name={name} value={value} onChange={onChange} />
-      {error && <ErrorMessage>{error}</ErrorMessage>}
     </InputBox>
   );
 }
